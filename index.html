@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resync — Adaptive Study Planner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="top-nav">
+      <a class="logo" href="#" aria-label="Resync home">⚡ Resync <span>Study Planner</span></a>
+      <div class="status-badge" id="sync-status" role="status">Saved on this device</div>
+    </header>
+
+    <main>
+      <section class="welcome">
+        <div>
+          <p class="eyebrow">YOUR STUDY SPACE</p>
+          <h1>Make today count.</h1>
+          <p class="subtitle">Plan a little, make steady progress, and use buffer time when life gets busy.</p>
+        </div>
+        <label class="date-picker">Plan for
+          <input type="date" id="selected-date">
+        </label>
+      </section>
+
+      <section class="metrics" aria-label="Study progress">
+        <article class="metric card">
+          <span class="label">Today's topics</span>
+          <strong class="value" id="today-count">0 / 0</strong>
+          <span class="metric-note">completed</span>
+        </article>
+        <article class="metric card">
+          <span class="label">Overall progress</span>
+          <strong class="value" id="progress-val">0%</strong>
+          <div class="progress-bar-bg" aria-label="Overall topic completion">
+            <div class="progress-bar-fill" id="progress-bar"></div>
+          </div>
+        </article>
+        <article class="metric card">
+          <span class="label">Study time today</span>
+          <strong class="value" id="velocity-val">0 hrs</strong>
+          <span class="metric-note">planned slots</span>
+        </article>
+      </section>
+
+      <section class="card assistant-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">PERSONAL STUDY ASSISTANT</p>
+            <h2>Prioritize for your exam</h2>
+          </div>
+          <label class="exam-picker">Exam
+            <select id="exam-select">
+              <option value="GATE CS">GATE Computer Science</option>
+              <option value="GATE EE">GATE Electrical Engineering</option>
+              <option value="GATE ME">GATE Mechanical Engineering</option>
+              <option value="UPSC CSE">UPSC Civil Services</option>
+              <option value="JEE Main">JEE Main</option>
+              <option value="NEET UG">NEET UG</option>
+              <option value="CAT">CAT</option>
+              <option value="GRE">GRE</option>
+              <option value="manual">Other exam (use my priorities)</option>
+            </select>
+          </label>
+        </div>
+        <p class="subtitle">Select an exam to get its important topic list. Add only the topics you want to study; overdue topics are moved to Sunday or holiday buffers when you run the planner.</p>
+        <div class="exam-topic-panel">
+          <div class="exam-topic-heading">
+            <h3 id="exam-topics-heading">Important topics for GATE CS</h3>
+            <span>Choose topics to add to your plan</span>
+          </div>
+          <div class="exam-topic-list" id="exam-topic-list" aria-live="polite"></div>
+        </div>
+        <button class="btn btn-primary assistant-button" id="prioritize-button" type="button">✨ Prioritize &amp; reschedule topics</button>
+        <div class="assistant-result" id="assistant-result" aria-live="polite">
+          <p>Choose your exam, set topic importance when adding topics, then run the assistant to see a suggested schedule.</p>
+        </div>
+        <p class="assistant-disclaimer">Important topics are curated, on-device suggestions—not a live AI service or a guarantee of exam weightage. Check the latest official syllabus.</p>
+      </section>
+
+      <section class="card planner-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">DAILY PLAN</p>
+            <h2 id="day-heading">Your study slots</h2>
+          </div>
+          <div class="day-controls">
+            <button class="btn btn-quiet" id="previous-day" type="button" aria-label="Previous day">←</button>
+            <button class="btn btn-quiet" id="next-day" type="button" aria-label="Next day">→</button>
+            <button class="btn btn-outline" id="holiday-toggle" type="button">Mark as holiday</button>
+          </div>
+        </div>
+        <p class="subtitle" id="day-note">Check off completed topics, or move them to a different study slot.</p>
+        <div class="slot-list" id="slot-list"></div>
+      </section>
+
+      <section class="card add-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">BUILD YOUR PLAN</p>
+            <h2 id="add-topic-heading">Add a topic to GATE CS</h2>
+          </div>
+        </div>
+        <form id="topic-form" class="topic-form">
+          <label>Topic
+            <input id="topic-title" name="title" type="text" maxlength="120" placeholder="e.g. Context-Free Grammars" required>
+          </label>
+          <label>Subject
+            <input id="topic-subject" name="subject" type="text" maxlength="60" placeholder="e.g. Automata" required>
+          </label>
+          <p class="topic-detection" id="topic-detection-preview" aria-live="polite">The study agent will check this topic against your selected exam.</p>
+          <label>Study slot
+            <select id="topic-slot" name="slot" required></select>
+          </label>
+          <label>Importance
+            <select name="importance">
+              <option value="normal">Normal</option>
+              <option value="high">High priority</option>
+              <option value="revision">Revision</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" type="submit">Add topic</button>
+        </form>
+      </section>
+
+      <section class="card report-card">
+        <div class="section-heading report-heading">
+          <div>
+            <p class="eyebrow">LOOK BACK</p>
+            <h2>Monthly report</h2>
+          </div>
+          <label class="month-picker">Report month
+            <input type="month" id="report-month">
+          </label>
+        </div>
+        <div class="report-metrics">
+          <article class="report-stat">
+            <span class="label">Topics finished</span>
+            <strong id="monthly-completed">0</strong>
+          </article>
+          <article class="report-stat">
+            <span class="label">Topics planned</span>
+            <strong id="monthly-planned">0</strong>
+          </article>
+          <article class="report-stat">
+            <span class="label">Completion rate</span>
+            <strong id="monthly-rate">0%</strong>
+          </article>
+          <article class="report-stat">
+            <span class="label">Active study days</span>
+            <strong id="monthly-days">0</strong>
+          </article>
+        </div>
+        <div class="report-log" id="report-log"></div>
+      </section>
+      <p class="storage-note">Your plan is saved in this browser on this device.</p>
+    </main>
+  </div>
+  <script src="study-agent.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
